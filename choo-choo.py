@@ -10,38 +10,38 @@ headers = {
 
 requestString = {
     'station_info' : "/Rail.svc/json/jStations?",
-    'arrival_info' : '/StationPrediction.svc/json/GetPrediction/all',
+    'arrival_info' : '/StationPrediction.svc/json/GetPrediction/'
 }
 
+code_dict = {}
 params = urllib.urlencode({
 })
 
-def webConnect( params):
+def webConnect( params, params2=""):
     conn = httplib.HTTPSConnection('api.wmata.com')
-    conn.request("GET", requestString[ params], "mystery", headers)
-    # conn.request("GET", "/Rail.svc/json/jStations?", "mystery", headers)
+    conn.request("GET", requestString[ params] + params2, "{body}", headers)
     response = conn.getresponse()
+    output = response.read()
     conn.close()
-    return response.read()
+    return output
     
 def getStationInfo( printerMode=False):
-    json_dict = json.loads( webConnect( 'station_info'))
+    json_dict = json.loads( webConnect( 'station_info' ))
 
     # Crack Open the Dictionary
     stations = json_dict['Stations']
-    code_dict = {}
     for ele in stations:
         if printerMode:
             print("%50s: \t%s \t%s" % (ele['Name'], ele['Code'], ele['LineCode1']))
         code_dict[ ele['Name']] = ele['Code']
-
-def getArrivals():
-    json_dict = json.loads( webConnect( 'arrival_info'))
+    
+def getArrivalInfo( code="all"):
+    json_dict = json.loads( webConnect( 'arrival_info', code))
     print json_dict
     
 def main():
     getStationInfo()
-    # getArrivals()
+    getArrivalInfo( code_dict['College Park-U of Md'])
     
 if __name__ == "__main__":
     try:
