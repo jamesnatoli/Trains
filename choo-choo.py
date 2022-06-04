@@ -37,11 +37,22 @@ def getStationInfo( printerMode=False):
     
 def getArrivalInfo( code="all"):
     json_dict = json.loads( webConnect( 'arrival_info', code))
-    print json_dict
-    
+    trains = json_dict['Trains']
+    output = []
+    print("%20s \t%s \t%s \t%s" % ('Destination', 'Cars', 'Line', 'Min'))
+    for ele in trains:
+        print("%20s: \t%s \t%s \t%s" % (ele['Destination'], ele['Car'], ele['Line'], ele['Min']))
+        if "BRD" in ele['Min'] or "ARR" in ele['Min']:
+            output.append( ele)
+    return output
+        
 def main():
     getStationInfo()
-    getArrivalInfo( code_dict['College Park-U of Md'])
+    output = getArrivalInfo( code_dict['College Park-U of Md'])
+    if not output:
+        print( "No trains arriving or boarding :(")
+    else:
+        print( output)
     
 if __name__ == "__main__":
     try:
