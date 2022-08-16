@@ -6,10 +6,10 @@ import http.client, urllib.request, urllib.parse, urllib.error, base64
 
 import argparse
 
-parser = argparse.ArgumentParser()
-
-parser.add_argument('-s', metavar="inputPath", dest='inputPath',action="store" , required=True, help='Input file path',type=str)
-parser.add_argument('-r', metavar="", dest='outputPath',action="store" , required=True, help='Output file path',type=str)
+parser = argparse.ArgumentParser( description='Display Train Times')
+parser.add_argument('-s', '--station', dest='stationOfInterest', action="store" , required=False, default='College Park-U of Md',
+                    help='Station of Interest', type=str)
+parser.add_argument('-r', '--run', dest='run', action="store_true" , required=False, default=False, help='Run continuously every 30 sec')
 
 headers = {
     # Request headers
@@ -54,15 +54,19 @@ def getArrivalInfo( code="all"):
     for ele in trains:
         print("%20s: \t%s \t%s \t%s" % (ele['Destination'], ele['Car'], ele['Line'], ele['Min']))
         if "BRD" in ele['Min'] or "ARR" in ele['Min']:
-            if "Branch Avenue" in ele['Destination'] or "Greenbelt" in ele['Destination'] or "Huntington" in ele['Destination']:
-                output.append( ele)
+            # if "Branch Avenue" in ele['Destination'] or "Greenbelt" in ele['Destination'] or "Huntington" in ele['Destination']:
+            output.append( ele)
     return output
         
 def main():
-    while True:
+    args = parser.parse_args()
+    flag = True
+    while flag or args.run:
+        flag = False
         print( time.asctime( time.localtime()))
         getStationInfo()
-        station = 'College Park-U of Md'
+        # station = 'College Park-U of Md'
+        station = args.stationOfInterest
         output = getArrivalInfo( code_dict[station])
         print('Info for station: %s'%( station))
         if not output:
@@ -82,6 +86,5 @@ if __name__ == "__main__":
         main()
     except OSError as e:
         print("[Errno {0}] {1}".format(e.errno, e.strerror))
-    # except Exception as e:
-    #     print "Error: Info below..."
-    #     print e
+    except KeyboardInterrupt as e:
+        print("You've interrupted me :(")
