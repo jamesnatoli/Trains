@@ -79,7 +79,8 @@ def main():
                     print( "The %s line train to %s is now arriving..."%( line_dict[ ele['Line']], ele['Destination']))
                 else:
                     print( "Something rotten in the state of Denmark...")
-        time.sleep(30)
+        if args.run:
+            time.sleep(30)
     
 if __name__ == "__main__":
     try:
